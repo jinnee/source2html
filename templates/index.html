@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+        <head>
+        <style>
+ul, #tree {
+  list-style-type: none;
+}
+
+#tree {
+  margin: 0;
+  padding: 0;
+}
+.caret {
+  cursor: pointer;
+  -webkit-user-select: none; /* Safari 3.1+ */
+  -moz-user-select: none; /* Firefox 2+ */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none;
+}
+
+.caret::before {
+  content: "\25B6";
+  color: black;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.caret-down::before {
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -webkit-transform: rotate(90deg); /* Safari */'
+  transform: rotate(90deg);  
+}
+
+.nested {
+  display: none;
+}
+
+.active {
+  display: block;
+}
+#iframe_content {
+    position : absolute;
+    top      : 0;
+    right    : 0;
+    height   : 100%;
+    width    : 80%;
+}
+#div_tree {
+    position : absolute;
+    top      : 0;
+    left    : 0;
+    height   : 100%;
+    width    : 20%;
+    overflow:scroll;
+}
+  
+        </style>
+    </head>
+
+<body>
+<div id="div_tree">    
+<ul id='tree'></ul>
+</div>
+<iframe id="iframe_content" name="iframe_content" height="300px" width="100%"></iframe>
+<script>
+let treeArray = new Array();
+!treeArray!
+let element;
+
+function getNodes(pnodes, n) {
+    result = '';
+    
+    for (var i = 0; i <= n - 1; i++) {
+        result += pnodes[i] + '/';
+    }
+    
+    result += pnodes[n];
+    
+    return result;
+}
+
+
+let nodes = treeArray[0].split('/').filter(function(x){
+    if (x != '') {
+        return x;
+    }
+});
+// root element
+const para = document.createElement('li');
+para.setAttribute('id', nodes[0]);
+const node = document.createTextNode(nodes[0]);
+para.appendChild(node);
+element = document.getElementById('tree');
+element.appendChild(para);
+
+for (var ta = 0; ta < treeArray.length; ta++) {
+    nodes = treeArray[ta].split('/').filter(function(x){
+        if (x != '') {
+            return x;
+        }
+    });
+
+    let ppp = 1;
+
+    for (var i = 0; i < nodes.length; i++) {
+        if (!document.getElementById(getNodes(nodes, i))) {
+            const parau = document.createElement('ul');
+            const para = document.createElement('li');
+            para.setAttribute('id', getNodes(nodes, i));
+            const node = document.createTextNode(nodes[i]);
+            para.appendChild(node);
+           
+            element = document.getElementById(getNodes(nodes,i-1));
+            
+            // adding anchors
+            if (i == nodes.length - 1) {
+                let splitHref = para.getAttribute('id').split('/');
+                let reducedHref ="";
+                
+                for (let a = 1; a < splitHref.length - 1; a++) {
+                    reducedHref += splitHref[a] + '/';
+                }
+                
+                reducedHref += splitHref[splitHref.length - 1];
+                
+                para.innerHTML = '<a href="' + reducedHref + '.html" target="iframe_content">'+para.innerText+'</a>';
+            }
+            
+            if(element.childNodes[ppp]) {
+                element.childNodes[ppp].appendChild(para);
+            } else {
+                parau.appendChild(para);
+                parau.classList.add("nested");
+                
+                if (element.innerText && element.innerText.includes(element.innerText)) {
+                    element.innerHTML = '<span class="caret">'+element.innerText+'</span>';
+                }
+                
+                element.appendChild(parau);
+            }
+            
+            ppp++;
+        } else {
+            continue;
+        }
+    }
+}
+
+var toggler = document.getElementsByClassName("caret");
+var i;
+
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("caret-down");
+  });
+}
+
+</script>
+</body>
+</html>
