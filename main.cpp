@@ -80,15 +80,21 @@ int main(int argc, char *argv[])
                QCoreApplication::translate("main", "Fixed location for .js and .css files."),
                                         QCoreApplication::translate("main", "directory"));
 
+    QCommandLineOption treeRootTitleOption(QStringList() << "t" << "title",
+               QCoreApplication::translate("main", "Title on the root element."),
+                                        QCoreApplication::translate("main", "directory"));
+
 
     extensionsOption.setDefaultValue("cpp;c;h");
     jsCssUrlOption.setDefaultValue("");
+    treeRootTitleOption.setDefaultValue("My Project");
 
 
     parser.addOption(sourceDirectoryOption);
     parser.addOption(destinationDirectoryOption);
     parser.addOption(extensionsOption);
     parser.addOption(jsCssUrlOption);
+    parser.addOption(treeRootTitleOption);
 
     parser.process(a);
 
@@ -103,6 +109,7 @@ int main(int argc, char *argv[])
         parser.showHelp(0);
     }
 
+    QString treeRootTitle = parser.value(treeRootTitleOption);
     sourceDir = parser.value(sourceDirectoryOption);
     destinationDir = parser.value(destinationDirectoryOption);
     QString jsCssUrl = parser.value(jsCssUrlOption);
@@ -165,7 +172,7 @@ int main(int argc, char *argv[])
     QString str;
     processFiles(sdir.path(), str, templates, parser.value(extensionsOption).split(";"));
     std::string textStd = str.toStdString();
-    Tools::replaceAll(textStd, sdir.path().toStdString(), "Fifteen");
+    Tools::replaceAll(textStd, sdir.path().toStdString(), treeRootTitle.toStdString() );
     QString res = QString::fromUtf8(textStd.c_str());
 
     templates->indexExport(ddir.path() + QDir::separator(), res);
